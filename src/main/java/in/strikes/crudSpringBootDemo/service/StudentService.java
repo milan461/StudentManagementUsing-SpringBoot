@@ -2,6 +2,8 @@ package in.strikes.crudSpringBootDemo.service;
 
 import in.strikes.crudSpringBootDemo.dto.CreateStudentRequestDto;
 import in.strikes.crudSpringBootDemo.dto.CreateStudentResponseDto;
+import in.strikes.crudSpringBootDemo.dto.UpdateStudentRequestDto;
+import in.strikes.crudSpringBootDemo.dto.UpdateStudentResponseDto;
 import in.strikes.crudSpringBootDemo.entity.Student;
 import in.strikes.crudSpringBootDemo.repository.StudentRepository;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,8 @@ public class StudentService {
         return studentList;
     }
 
-    public Student updateStudent(Long id,Student studentReq) {
+    public UpdateStudentResponseDto updateStudent(Long id, UpdateStudentRequestDto studentReq) {
+
         Optional<Student>existingStudent=studentRepository.findById(id);
         if(existingStudent.isEmpty()){
             return null;
@@ -45,11 +48,11 @@ public class StudentService {
         studentToSave.setName(studentReq.getName());
         studentToSave.setAge(studentReq.getAge());
         studentToSave.setRollno(studentReq.getRollno());
-        studentToSave.setEmail(studentReq.getEmail());
+       //studentToSave.setEmail(studentReq.getEmail());
         studentToSave.setSubject(studentReq.getSubject());
-        return  studentRepository.save(studentToSave);
+        Student studentrespo =  studentRepository.save(studentToSave);
 
-
+           return mapToUpdateDto(studentrespo);
     }
 
     public String deleteStudent(Long id) {
@@ -88,4 +91,18 @@ public class StudentService {
     createStudentResponseDto.setMessage("Student Created Successfully");
     return createStudentResponseDto;
 }
+
+   private UpdateStudentResponseDto mapToUpdateDto(Student student){
+        UpdateStudentResponseDto updatedStudent=new UpdateStudentResponseDto();
+        updatedStudent.setName(student.getName());
+        updatedStudent.setAge(student.getAge());
+        updatedStudent.setRollno(student.getRollno());
+        updatedStudent.setSubject(student.getSubject());
+        updatedStudent.setEmail(student.getEmail());
+        updatedStudent.setUpdatedAt(student.getUpdatedAt());
+        updatedStudent.setId(student.getId());
+        updatedStudent.setMessage("Student updated successfully");
+           return updatedStudent;
+
+   }
 }

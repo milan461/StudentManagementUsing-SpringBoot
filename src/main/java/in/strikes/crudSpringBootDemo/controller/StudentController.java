@@ -2,6 +2,8 @@ package in.strikes.crudSpringBootDemo.controller;
 
 import in.strikes.crudSpringBootDemo.dto.CreateStudentRequestDto;
 import in.strikes.crudSpringBootDemo.dto.CreateStudentResponseDto;
+import in.strikes.crudSpringBootDemo.dto.UpdateStudentRequestDto;
+import in.strikes.crudSpringBootDemo.dto.UpdateStudentResponseDto;
 import in.strikes.crudSpringBootDemo.entity.Student;
 import in.strikes.crudSpringBootDemo.service.StudentService;
 import org.springframework.http.HttpStatus;
@@ -51,9 +53,9 @@ public class StudentController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Student>UpdateStudent(@PathVariable Long id,
-                                            @RequestBody Student studentReq){
-        Student responseGet=studentService.updateStudent(id,studentReq);
+    public ResponseEntity<UpdateStudentResponseDto>UpdateStudent(@PathVariable Long id,
+                                                                 @RequestBody UpdateStudentRequestDto studentReq){
+        UpdateStudentResponseDto responseGet=studentService.updateStudent(id,studentReq);
 //         return ResponseEntity
 //                 .status(HttpStatus.FOUND)
 //                 .body(responseGet);
