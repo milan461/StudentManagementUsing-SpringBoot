@@ -1,25 +1,34 @@
 package in.strikes.crudSpringBootDemo.dto;
 
+import jakarta.validation.constraints.*;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.time.LocalDateTime;
 
 public class CreateStudentResponseDto {
-    private Long id;
+    //private Long id;
+    @NotBlank(message = "name can't be null or empty")
+    @Size(min=2,max=50)
     private String name;
+    @Email(message = "email should have @")
     private String email;
+    @Min(value = 18,message = "age should be grater than 18 ")
     private int age ;
-    private int rollno;
+    @NotEmpty(message = "fill valid roll no.")
+    private Integer rollno;
+    @NotBlank(message = "subject can't be null or empty")
     private String subject;
     private String message;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+//
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
     public String getName() {
         return name;

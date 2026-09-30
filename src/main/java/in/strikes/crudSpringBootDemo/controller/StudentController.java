@@ -6,6 +6,7 @@ import in.strikes.crudSpringBootDemo.dto.UpdateStudentRequestDto;
 import in.strikes.crudSpringBootDemo.dto.UpdateStudentResponseDto;
 import in.strikes.crudSpringBootDemo.entity.Student;
 import in.strikes.crudSpringBootDemo.service.StudentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,26 +22,26 @@ public class StudentController {
         this.studentService= studentService;
       }
 
-    @PostMapping("/create")
-    public ResponseEntity<CreateStudentResponseDto> createStudent(@RequestBody CreateStudentRequestDto studentRequestDto){
+    @PostMapping
+    public ResponseEntity<CreateStudentResponseDto> createStudent(@Valid @RequestBody CreateStudentRequestDto studentRequestDto){
         CreateStudentResponseDto createdStudent = studentService.createStudent(studentRequestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdStudent);
     }
-   @GetMapping("/get/{id}")
-    public ResponseEntity<Student>getAStudent(@PathVariable Long id){
-         Student responseGet=studentService.getStudentById(id);
+   @GetMapping("/{id}")
+    public ResponseEntity<CreateStudentResponseDto>getAStudent(@PathVariable Long id){
+        CreateStudentResponseDto responseGet=studentService.getStudentById(id);
 //         return ResponseEntity
 //                 .status(HttpStatus.FOUND)
 //                 .body(responseGet);
-       if(responseGet==null){
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-       }
+//       if(responseGet==null){
+//           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//       }
        return ResponseEntity.ok(responseGet);
    }
 
-    @GetMapping("/getAll")
+    @GetMapping
     public ResponseEntity<List<Student>> getAllStudent(){
         List<Student> responseList=studentService.getStudents();
 //         return ResponseEntity
@@ -52,27 +53,27 @@ public class StudentController {
         return ResponseEntity.ok(responseList);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping
     public ResponseEntity<UpdateStudentResponseDto>UpdateStudent(@PathVariable Long id,
                                                                  @RequestBody UpdateStudentRequestDto studentReq){
         UpdateStudentResponseDto responseGet=studentService.updateStudent(id,studentReq);
 //         return ResponseEntity
 //                 .status(HttpStatus.FOUND)
 //                 .body(responseGet);
-        if(responseGet==null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+//        if(responseGet==null){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//        }
         return ResponseEntity.ok(responseGet);
     }
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping
     public ResponseEntity<String>deleteAStudent(@PathVariable Long id) {
-        String responseGet = studentService.deleteStudent(id);
+         studentService.deleteStudent(id);
 //         return ResponseEntity
 //                 .status(HttpStatus.FOUND)
 //                 .body(responseGet);
-        if (responseGet.equals("student not found")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        return ResponseEntity.ok(responseGet);
+//        if (responseGet.equals("student not found")) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//        }
+           return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

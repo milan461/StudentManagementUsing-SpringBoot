@@ -5,6 +5,8 @@ import in.strikes.crudSpringBootDemo.dto.CreateStudentResponseDto;
 import in.strikes.crudSpringBootDemo.dto.UpdateStudentRequestDto;
 import in.strikes.crudSpringBootDemo.dto.UpdateStudentResponseDto;
 import in.strikes.crudSpringBootDemo.entity.Student;
+import in.strikes.crudSpringBootDemo.exception.DuplicateResourceException;
+import in.strikes.crudSpringBootDemo.exception.ResourceNotFoundException;
 import in.strikes.crudSpringBootDemo.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,17 +22,21 @@ public class StudentService {
     }
     public CreateStudentResponseDto createStudent(CreateStudentRequestDto studentReqDto) {
       Student student = mapToEntity(studentReqDto);
+      if(emailExists(student)){
+          throw new DuplicateResourceException("Student with Email"+student.getEmail()+"already exist");
+      }
       Student studentDtoRes=studentRepository.save(student);
            return mapToDto(studentDtoRes);
         }
 
 
-    public Student getStudentById(Long id) {
-        Optional<Student> respGet=studentRepository.findById(id);
-        if(respGet.isPresent()){
-            return respGet.get();
-        }
-        return null;
+    public CreateStudentResponseDto getStudentById(Long id) {
+        Student studentResp=studentRepository
+                .findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Student with id"+ id+"not found"));
+
+        return mapToDto(studentResp);
+
     }
 
     public List<Student> getStudents() {
@@ -40,30 +46,31 @@ public class StudentService {
 
     public UpdateStudentResponseDto updateStudent(Long id, UpdateStudentRequestDto studentReq) {
 
-        Optional<Student>existingStudent=studentRepository.findById(id);
-        if(existingStudent.isEmpty()){
-            return null;
-        }
-        Student studentToSave = existingStudent.get();
-        studentToSave.setName(studentReq.getName());
-        studentToSave.setAge(studentReq.getAge());
-        studentToSave.setRollno(studentReq.getRollno());
+        Student existingStudent=studentRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("Student with id"+ id+"not found"));
+
+
+
+        existingStudent.setName(studentReq.getName());
+        existingStudent.setAge(studentReq.getAge());
+        existingStudent.setRollno(studentReq.getRollno());
        //studentToSave.setEmail(studentReq.getEmail());
-        studentToSave.setSubject(studentReq.getSubject());
-        Student studentrespo =  studentRepository.save(studentToSave);
+        existingStudent.setSubject(studentReq.getSubject());
+        Student studentrespo =  studentRepository.save(existingStudent);
 
            return mapToUpdateDto(studentrespo);
     }
 
-    public String deleteStudent(Long id) {
-        Optional<Student> existingStudent = studentRepository.findById(id);
-        if (existingStudent.isEmpty()) {
-            return "student not found";
+    public void deleteStudent(Long id) {
+      Student existingStudent = studentRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Student with id"+ id+"not found"));
+//        if (existingStudent.isEmpty()) {
+//            return "student not found";
+//
+//        }
+            studentRepository.delete(existingStudent);
 
-        } else {
-            studentRepository.delete(existingStudent.get());
-            return "student deleted successfully";
-        }
+
     }
 
     private Student mapToEntity(CreateStudentRequestDto studentReqDto) {
@@ -80,7 +87,7 @@ public class StudentService {
 
     private CreateStudentResponseDto mapToDto(Student student){
     CreateStudentResponseDto createStudentResponseDto =new CreateStudentResponseDto();
-    createStudentResponseDto.setId(student.getId());
+   // createStudentResponseDto.setId(student.getId());
     createStudentResponseDto.setName(student.getName());
     createStudentResponseDto.setAge(student.getAge());
     createStudentResponseDto.setRollno(student.getRollno());
@@ -104,5 +111,10 @@ public class StudentService {
         updatedStudent.setMessage("Student updated successfully");
            return updatedStudent;
 
+   }
+
+
+   private boolean emailExists(Student student){
+        return studentRepository.existsByEmail(student.getEmail());
    }
 }
